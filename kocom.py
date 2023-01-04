@@ -23,7 +23,7 @@ import configparser
 
 
 # define -------------------------------
-SW_VERSION = '2022.12.09'
+SW_VERSION = '2023.01.04'
 CONFIG_FILE = 'kocom.conf'
 BUF_SIZE = 100
 
@@ -680,7 +680,7 @@ def publish_discovery(dev, sub=''):
             'curr_temp_t': 'kocom/room/thermo/{}/state'.format(num),
             'curr_temp_tpl': '{{ value_json.cur_temp }}',
             'modes': ['off', 'heat'],
-            'min_temp': 20,
+            'min_temp': 10,
             'max_temp': 30,
             'ret': 'false',
             'qos': 0,
