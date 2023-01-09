@@ -679,7 +679,7 @@ def publish_discovery(dev, sub=''):
 
             'curr_temp_t': 'kocom/room/thermo/{}/state'.format(num),
             'curr_temp_tpl': '{{ value_json.cur_temp }}',
-            'modes': ['off', 'away', 'heat'],
+            'modes': ['off', 'heat'],
             'min_temp': 5,
             'max_temp': 35,
             'ret': 'false',
