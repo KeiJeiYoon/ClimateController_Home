@@ -331,6 +331,7 @@ def send_wait_response(dest, src=device_h_dic['wallpad']+'00', cmd=cmd_h_dic['st
     #logging.debug('waiting for send_wait_response :'+dest)
     wait_target.put(dest)
     #logging.debug('entered send_wait_response :'+dest)
+#    ret = { 'value':'0'*16, 'flag':False }
     ret = { 'value':'0'*16, 'flag':None }
 
     if send(dest, src, cmd, value, log, check_ack) != False:
@@ -684,6 +685,7 @@ def publish_discovery(dev, sub=''):
             'max_temp': 35,
             'ret': 'false',
             'qos': 0,
+            'pr_modes': ['eco', 'sleep', 'activity'],
             'uniq_id': '{}_{}_{}{}'.format('kocom', 'wallpad', dev, num),
             'device': {
                 'name': '코콤 스마트 월패드',
