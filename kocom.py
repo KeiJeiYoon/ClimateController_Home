@@ -282,13 +282,12 @@ def parse(hex_data):
             'flag':None}
     return ret
 
-
 def thermo_parse(value):
     ret = { 'heat_mode': 'heat' if value[:4] == '1100' else 'off' if value[:4] == '0001' else 'fan_only',
             'set_temp': int(value[4:6], 16) if value[:2] == '11' else int(config.get('User', 'init_temp')),
-            'cur_temp': int(value[8:10], 16)}
+            'cur_temp': int(value[8:10], 16),
+            'run_state': 'True' if (int(value[4:6],16) > int(value[8:10],16) and value[:4] == '1100') else 'False'}
     return ret
-
 
 def light_parse(value):
     ret = {}
@@ -669,17 +668,50 @@ def publish_discovery(dev, sub=''):
         topic = 'homeassistant/climate/kocom_{}_thermostat/config'.format(sub)
         payload = {
             'name': 'Kocom {} Thermostat'.format(sub),
-            'mode_cmd_t': 'kocom/room/thermo/{}/heat_mode/command'.format(num),
-            'mode_stat_t': 'kocom/room/thermo/{}/state'.format(num),
-            'mode_stat_tpl': '{{ value_json.heat_mode }}',
+            
+            'mode_command_topic': 'kocom/room/thermo/{}/heat_mode/command'.format(num),
 
-            'temp_cmd_t': 'kocom/room/thermo/{}/set_temp/command'.format(num),
-            'temp_stat_t': 'kocom/room/thermo/{}/state'.format(num),
-            'temp_stat_tpl': '{{ value_json.set_temp }}',
+            'mode_state_topic': 'kocom/room/thermo/{}/state'.format(num),
+            'mode_state_template': '{{ value_json.heat_mode }}',
 
-            'curr_temp_t': 'kocom/room/thermo/{}/state'.format(num),
-            'curr_temp_tpl': '{{ value_json.cur_temp }}',
+            'temperature_command_topic': 'kocom/room/thermo/{}/set_temp/command'.format(num),
+            
+            'temperature_state_topic': 'kocom/room/thermo/{}/state'.format(num),
+            'temperature_state_template': '{{ value_json.set_temp }}',
+
+            'current_temperature_topic': 'kocom/room/thermo/{}/state'.format(num),
+            'current_temperature_template': '{{ value_json.cur_temp }}',
+
+            'preset_mode_command_topic': 'kocom/room/thermo/{}/preset_mode/command'.format(num),
+            'preset_mode_state_topic': 'kocom/room/thermo/{}/state'.format(num),
+
+            'action_topic': 'kocom/room/thermo/{}/state'.format(num),
+            'action_template':
+                '{% if  value_json.heat_mode == "off" %}'
+                    'off'
+                '{% elif value_json.heat_mode == "heat" and value_json.run_state == "True" %}' 
+                    'heating'
+                '{% else %}'
+                    'idle' 
+                '{% endif %}',
+            #'action_template':
+            #    '{% if  value_json.heat_mode == "off" %}'
+            #        'off'
+            #    '{% elif value_json.heat_mode == "heat" and value_json.run_state %}' 
+            #        'heating'
+            #    '{% else %}'
+            #        'idle' 
+            #    '{% endif %}',
+
+            #'action_topic': 'kocom/room/thermo/{}/properties'.format(num),
+            #'action_template': '{{value_json.action}}', 
+
+            #'action_Topic': 'kocom/room/thermo/{}'.format(num),
+            #'action_template': '{% set values = {"idle":"idle", "off":"off", "heat":"heating"} %}{{values[value_json.running_state]}}',
+                        
             'modes': ['off', 'heat', 'fan_only'],
+            'preset_modes': ['away', 'sleep', 'activity'],
+            
             'min_temp': 5,
             'max_temp': 35,
             'ret': 'false',
