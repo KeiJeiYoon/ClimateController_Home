@@ -11,6 +11,12 @@ Kocom Wallpad with RS485
 2. 애드온 스토어 중간쯤에서 "Kocom Wallpad with RS485" 클릭.
 3. share/kocom/ 폴더에 있는 kocom.conf 파일을 환경에 맞게 수정.
 4. MQTT의 로긴 : username 과 password 를 넣는거로 설정했기 때문에 구성원에서 설정내용과 같이 사용자를 추가한다.
+5. 2013-01-15
+   HVAC Action 추가
+   난방 동작 상태에 따라 [Off], [Idle], [Heating] 표시.
+   실물 WallPad가 없이 Ha를 동작시키는 경우 send_wait_response 의 
+      ret = { 'value':'0'*16, 'flag':False } 를
+      ret = { 'value':'0'*16, 'flag':None } 로 수정하여 첫번째 기기만 찾고 나머지는 [알 수 없음]으로 표시되는 것을 막는다.
 -------------------------------------------------------------------------------------
 (2022.12.6 ) github 개설
 
