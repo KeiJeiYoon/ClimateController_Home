@@ -30,6 +30,8 @@ BUF_SIZE = 100
 read_write_gap = 0.03  # minimal time interval between last read to write
 polling_interval = 300  # polling interval
 
+run_state_old = False
+
 header_h = 'aa55'
 trailer_h = '0d0d'
 packet_size = 21  # total 21bytes
@@ -283,10 +285,13 @@ def parse(hex_data):
     return ret
 
 def thermo_parse(value):
+    global run_state_old
     ret = { 'heat_mode': 'heat' if value[:4] == '1100' else 'off' if value[:4] == '0001' else 'fan_only',
             'set_temp': int(value[4:6], 16) if value[:2] == '11' else int(config.get('User', 'init_temp')),
             'cur_temp': int(value[8:10], 16),
-            'run_state': 'True' if (int(value[4:6],16) > int(value[8:10],16) and value[:4] == '1100') else 'False'}
+            'run_state': True if (int(value[4:6], 16) > int(value[8:10], 16)) and value[:4] == '1100' 
+                    else True if (int(value[4:6], 16) == int(value[8:10], 16)) and value[:4] == '1100' and run_state_old else False }
+    run_state_old = '{{ value_json.run_state }}'
     return ret
 
 def light_parse(value):
@@ -689,7 +694,7 @@ def publish_discovery(dev, sub=''):
             'action_template':
                 '{% if  value_json.heat_mode == "off" %}'
                     'off'
-                '{% elif value_json.heat_mode == "heat" and value_json.run_state == "True" %}' 
+                '{% elif value_json.heat_mode == "heat" and value_json.run_state %}' 
                     'heating'
                 '{% else %}'
                     'idle' 
@@ -714,6 +719,9 @@ def publish_discovery(dev, sub=''):
             
             'min_temp': 5,
             'max_temp': 35,
+ 
+            'precision': 0.5,
+         
             'ret': 'false',
             'qos': 0,
             'uniq_id': '{}_{}_{}{}'.format('kocom', 'wallpad', dev, num),
