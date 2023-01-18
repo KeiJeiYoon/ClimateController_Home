@@ -30,8 +30,6 @@ BUF_SIZE = 100
 read_write_gap = 0.03  # minimal time interval between last read to write
 polling_interval = 300  # polling interval
 
-run_state_old = False
-
 header_h = 'aa55'
 trailer_h = '0d0d'
 packet_size = 21  # total 21bytes
@@ -291,7 +289,7 @@ def thermo_parse(value):
             'cur_temp': int(value[8:10], 16),
             'run_state': True if (int(value[4:6], 16) > int(value[8:10], 16)) and value[:4] == '1100' 
                     else True if (int(value[4:6], 16) == int(value[8:10], 16)) and value[:4] == '1100' and run_state_old else False }
-    run_state_old = '{{ value_json.run_state }}'
+    run_state_old = ret['run_state']
     return ret
 
 def light_parse(value):
